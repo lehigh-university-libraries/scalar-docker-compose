@@ -1,0 +1,3 @@
+Source: https://github.com/libops/captcha-protect
+Commit: 2c1b95bf1adca1cace71d9ce079c11936e26b86d
+Excluded: .github, .git, ci, *.md, *_test.go (recursively).

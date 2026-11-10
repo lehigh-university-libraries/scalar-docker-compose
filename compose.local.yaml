@@ -1,0 +1,5 @@
+# Let Docker choose an available subnet on development machines.
+networks:
+  default:
+    ipam:
+      config: !reset []

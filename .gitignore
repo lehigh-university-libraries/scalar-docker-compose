@@ -1,0 +1,12 @@
+.env
+.env.*
+secrets/*
+!secrets/.keep
+backups/
+data/
+*.sql
+*.sql.gz
+*.dump
+*.patch
+certs/*
+!certs/.keep

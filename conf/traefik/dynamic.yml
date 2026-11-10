@@ -1,0 +1,43 @@
+http:
+  routers:
+    scalar:
+      rule: Host(`scalar.lehigh.edu`)
+      entryPoints: [websecure]
+      tls: {}
+      middlewares: [rate-limit, captcha-protect]
+      service: scalar
+  services:
+    scalar:
+      loadBalancer:
+        servers:
+          - url: http://scalar:80
+  middlewares:
+    rate-limit:
+      rateLimit:
+        average: 20
+        period: 1s
+        burst: 200
+    captcha-protect:
+      plugin:
+        captcha-protect:
+          window: 864000
+          mode: regex
+          protectRoutes: ["^/"]
+          protectParameters: "true"
+          exemptIps: [128.180.0.0/16, 4.59.138.56/29, 162.223.16.248/29, 208.220.178.48/28, 209.66.120.16/28]
+          challengeURL: ""
+          challengeTmpl: /etc/traefik/challenge.tmpl.html
+          challengeStatusCode: 429
+          captchaProvider: turnstile
+          siteKey: '{{ env "TURNSTILE_SITE_KEY" }}'
+          secretKey: '{{ env "TURNSTILE_SECRET_KEY" }}'
+          persistentStateFile: /data/state.json
+          periodSeconds: 30
+          failureThreshold: 3
+          enableGooglebotIPCheck: "true"
+          enableUptimeRobotBypass: "true"
+
+tls:
+  certificates:
+    - certFile: /run/secrets/CERT_PUBLIC_KEY
+      keyFile: /run/secrets/CERT_PRIVATE_KEY
