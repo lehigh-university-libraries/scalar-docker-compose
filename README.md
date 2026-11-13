@@ -320,3 +320,19 @@ is excluded from captcha-protect so Google can fetch it without a challenge.
 This requires a Scalar image rebuilt from the updated Nginx base; promote its
 published digest before using the endpoint. Verify the public URL returns 200
 and `google-site-verification: google204a4e549d4da46a.html`.
+
+## Database backup copies
+
+`db-backup` runs at 02:00 UTC, writing compressed SQL to `./backups/daily/`
+and the latest successful dump of each month to `./backups/monthly/`.
+It retains seven daily dates and the previous twelve completed months, plus the
+current month's latest copy. Pruning runs only after a successful dump.
+SET backs up Galera every 30 days; these additional copies are a LOCKSS
+(Lots of Copies Keep Stuff Safe) precaution. They cover the configured application
+database; uploaded files and other volumes still need their own backups.
+
+Build/publish Buildkit's `mysql-backup` image before rollout, then set
+`MYSQL_BACKUP_IMAGE` in `.env` to its published GHCR image reference **with digest**.
+The default `:main` is the release handoff reference, not an immutable pin.
+For an immediate dump: `docker compose exec db-backup /command/with-contenv mysql-backup.sh`.
+See Buildkit's `images/mysql-backup/README.md` for restore instructions and limits.

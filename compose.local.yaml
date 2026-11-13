@@ -3,3 +3,7 @@ networks:
   default:
     ipam:
       config: !reset []
+
+services:
+  db-backup:
+    profiles: [none]

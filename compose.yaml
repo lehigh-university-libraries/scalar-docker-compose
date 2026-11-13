@@ -1,4 +1,22 @@
 services:
+  db-backup:
+    # Pin MYSQL_BACKUP_IMAGE to the published digest after image release.
+    image: ${MYSQL_BACKUP_IMAGE:-ghcr.io/lehigh-university-libraries/mysql-backup:main}
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DB_HOST: ${SCALAR_DB_HOSTNAME:-}
+      DB_PORT: "${DB_PORT:-3306}"
+      DB_USER: ${SCALAR_DB_USERNAME:-}
+      DB_NAME: ${SCALAR_DB_DATABASE:-}
+      BACKUP_CRON: "0 2 * * *" # UTC; 7 daily copies and 12 completed months.
+    secrets:
+      - source: SCALAR_DB_PASSWORD
+        target: DB_PASSWORD
+    volumes:
+      - ./backups:/db
+
   scalar:
     image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:3c8c426b592ca1928eea9b4ae57cd12757fb4957ec7e7b32c652eb130ce2a8a7
     restart: unless-stopped
