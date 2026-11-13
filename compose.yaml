@@ -51,7 +51,7 @@ services:
       - --providers.file.filename=/etc/traefik/dynamic.yml
       - --providers.file.watch=true
       - --experimental.localplugins.captcha-protect.modulename=github.com/libops/captcha-protect
-      - --accesslog=true
+      - --accesslog=false
     environment:
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:?Set TURNSTILE_SITE_KEY}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:?Set TURNSTILE_SECRET_KEY}
