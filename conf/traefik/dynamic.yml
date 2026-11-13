@@ -34,6 +34,7 @@ http:
           window: 864000
           mode: regex
           protectRoutes: ["^/"]
+          excludeRoutes: ['^/google204a4e549d4da46a\.html$']
           protectParameters: "true"
           exemptIps: [128.180.0.0/16, 4.59.138.56/29, 162.223.16.248/29, 208.220.178.48/28, 209.66.120.16/28]
           challengeURL: ""

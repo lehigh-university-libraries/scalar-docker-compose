@@ -311,3 +311,12 @@ follow `SCALAR_LOG_THRESHOLD`. Logs continue to go to stderr. The deployment
 Compose defaults to `4437`; the image defaults to `32767`. Recreate Scalar after
 changing the setting. This requires an image built with the severity-filter
 support; PHP-FPM does not read application environment variables directly.
+
+### Google Search Console
+
+The shared Buildkit Nginx image reserves `/google204a4e549d4da46a.html` and serves
+its image-owned verification file outside Scalar's document root. The exact path
+is excluded from captcha-protect so Google can fetch it without a challenge.
+This requires a Scalar image rebuilt from the updated Nginx base; promote its
+published digest before using the endpoint. Verify the public URL returns 200
+and `google-site-verification: google204a4e549d4da46a.html`.

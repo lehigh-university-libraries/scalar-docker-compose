@@ -1,6 +1,6 @@
 services:
   scalar:
-    image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:fe1b5b947de540f03398a5ca014c3179601c658461b0e4c4ad1225f13e69bf11
+    image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:3c8c426b592ca1928eea9b4ae57cd12757fb4957ec7e7b32c652eb130ce2a8a7
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
