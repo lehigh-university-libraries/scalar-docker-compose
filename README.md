@@ -21,6 +21,27 @@ the first success marks them healthy immediately. Normal checks run every 30 sec
 
 `make up` now also waits up to approximately one minute for a database connection and `SELECT 1` using Scalar's bundled configuration and application account. Run `make database` to repeat the read-only check. The container health check still tests PHP-FPM separately; it does not monitor the database continuously or validate the schema. HAProxy must use Galera-aware backend health checks.
 
+### Start Scalar with systemd
+
+For the production checkout at `/opt/scalar-docker-compose`, install the unit
+after configuring `.env`, secret files, certificates, HAProxy, and UFW:
+
+```sh
+sudo install -m 0644 /opt/scalar-docker-compose/scripts/systemd/scalar.service /etc/systemd/system/scalar.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now scalar.service
+sudo systemctl status scalar.service
+```
+
+The unit starts after Docker, HAProxy, and network readiness; waits for container
+health; then checks database connectivity and book permissions. It uses the
+pinned images without pulling updates at boot. Enabling it also adds it to
+Docker's startup dependencies so it starts again after Docker is restarted.
+Stopping the unit stops the containers while preserving their network, volumes,
+and data. Docker restart policies still apply independently, so startup ordering
+does not replace database retries. Inspect unit failures with
+`journalctl -u scalar.service` and application logs with `docker compose logs`.
+
 ### Campus monitoring
 
 Requests to `/` from campus source IPs (`128.180.0.0/16`) with a Host header

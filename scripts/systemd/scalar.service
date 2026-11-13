@@ -1,0 +1,25 @@
+[Unit]
+Description=Scalar Compose stack
+BindsTo=docker.service
+Requires=haproxy.service
+Wants=network-online.target
+After=docker.service haproxy.service network-online.target
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+User=root
+Group=root
+Type=oneshot
+WorkingDirectory=/opt/scalar-docker-compose
+ExecStart=/usr/bin/docker compose up -d --wait --wait-timeout 180
+ExecStartPost=/usr/bin/make database permissions
+ExecStop=/usr/bin/docker compose stop --timeout 30
+TimeoutStartSec=300
+TimeoutStopSec=90
+Restart=on-failure
+RestartSec=15s
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target docker.service
