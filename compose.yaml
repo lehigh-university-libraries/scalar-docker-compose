@@ -1,10 +1,11 @@
 services:
   scalar:
-    image: ghcr.io/lehigh-university-libraries/scalar:2.6.10-php84@sha256:22c25e9c608b1b4d6ebebcfd24930c143a6345c677674fe9cd0ef41fc79c9c43
+    image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:fe1b5b947de540f03398a5ca014c3179601c658461b0e4c4ad1225f13e69bf11
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
+      SCALAR_PHP_ERROR_REPORTING: ${SCALAR_PHP_ERROR_REPORTING:-4437}
       SCALAR_DB_HOSTNAME: ${SCALAR_DB_HOSTNAME:-}
       SCALAR_DB_USERNAME: ${SCALAR_DB_USERNAME:-}
       SCALAR_DB_DATABASE: ${SCALAR_DB_DATABASE:-}

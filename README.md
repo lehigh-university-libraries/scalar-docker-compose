@@ -298,3 +298,16 @@ docker compose up -d --no-deps --force-recreate --wait traefik
 The helper copies files only; it does not restart services, install a renewal
 hook, or change the host certificate updater. Keep these renewal steps in the
 host certificate renewal procedure.
+
+### PHP log severity
+
+`SCALAR_PHP_ERROR_REPORTING` accepts a numeric PHP error-reporting bitmask.
+Use `4437` for fatal/error categories (`E_ERROR`, `E_PARSE`, `E_CORE_ERROR`,
+`E_COMPILE_ERROR`, `E_USER_ERROR`, `E_RECOVERABLE_ERROR`), or `32767` to include
+warnings, notices, and deprecations. `0` disables PHP error logging through
+Scalar's error handler. The mask applies to native PHP reporting and
+CodeIgniter's PHP-error logger; application messages such as login events still
+follow `SCALAR_LOG_THRESHOLD`. Logs continue to go to stderr. The deployment
+Compose defaults to `4437`; the image defaults to `32767`. Recreate Scalar after
+changing the setting. This requires an image built with the severity-filter
+support; PHP-FPM does not read application environment variables directly.
