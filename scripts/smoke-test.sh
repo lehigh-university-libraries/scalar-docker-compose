@@ -25,6 +25,13 @@ trap cleanup EXIT
 mkdir -p "$work/plugins"
 cp -R conf/traefik/plugins/captcha-protect "$work/plugins/"
 cp conf/traefik/dynamic.yml "$work/dynamic.yml"
+# Simulate campus clients on the isolated test subnet; retain real client-IP matching.
+python3 - "$work/dynamic.yml" "198.19.$(( $$ % 250 )).0/24" <<'PYTHON'
+from pathlib import Path
+import sys
+path = Path(sys.argv[1])
+path.write_text(path.read_text().replace("ClientIP(`128.180.0.0/16`)", "ClientIP(`" + sys.argv[2] + "`)"))
+PYTHON
 cp conf/traefik/challenge.tmpl.html "$work/challenge.tmpl.html"
 openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=scalar.lehigh.edu \
   -keyout "$work/privkey.pem" -out "$work/cert.pem" >/dev/null 2>&1
@@ -67,11 +74,22 @@ fi
 # shellcheck disable=SC2016
 "${compose[@]}" exec -T scalar sh -exc '
   test "$(curl -s -o /dev/null -w "%{http_code}" -H "Host: scalar.lehigh.edu" http://traefik/)" = 301
+  test "$(curl -s -o /tmp/monitor -w "%{http_code}" -H "Host: campus-monitor.example" http://traefik/)" = 200
+  grep -qx OK /tmp/monitor
+  test "$(curl -ks -o /tmp/monitor -w "%{http_code}" -H "Host: campus-monitor.example" https://traefik/)" = 200
+  grep -qx OK /tmp/monitor
+  test "$(curl -ks -o /dev/null -w "%{http_code}" -H "Host: campus-monitor.example" https://traefik/not-a-health-path)" = 404
   test "$(curl -ks -o /tmp/challenge -w "%{http_code}" -H "Host: scalar.lehigh.edu" https://traefik/)" = 429
   grep -q "Verifying connection | Lehigh University Libraries" /tmp/challenge
   curl -fsS http://localhost/smoke/media.txt | grep -q media-ok
   test "$(curl -s -A SemrushBot -o /dev/null -w "%{http_code}" http://localhost/smoke/media.txt)" = 403
   test "$(curl -s -o /dev/null -w "%{http_code}" http://localhost/system/application/config/database.php)" = 404
+'
+# Loopback is outside the simulated campus range; forwarding headers cannot grant access.
+# shellcheck disable=SC2016 # Expand response inside the container, not on the host.
+"${compose[@]}" exec -T traefik sh -ec '
+  response=$(wget --no-check-certificate -S -O /dev/null --header="Host: campus-monitor.example" --header="X-Forwarded-For: 128.180.155.198" https://127.0.0.1/ 2>&1 || true)
+  printf "%s\n" "$response" | grep -q "404 Not Found"
 '
 "${compose[@]}" exec -T --user nginx scalar sh -s -- check < scripts/permissions.sh
 printf '%s\n' 'PASS: Scalar health, HTTPS redirect, CAPTCHA challenge, media, bot blocks, and protected configuration.'

@@ -21,6 +21,17 @@ the first success marks them healthy immediately. Normal checks run every 30 sec
 
 `make up` now also waits up to approximately one minute for a database connection and `SELECT 1` using Scalar's bundled configuration and application account. Run `make database` to repeat the read-only check. The container health check still tests PHP-FPM separately; it does not monitor the database continuously or validate the schema. HAProxy must use Galera-aware backend health checks.
 
+### Campus monitoring
+
+Requests to `/` from campus source IPs (`128.180.0.0/16`) with a Host header
+other than `scalar.lehigh.edu` receive a plain `200 OK` from Traefik's internal
+ping service on HTTP or HTTPS. This checks Traefik availability only, not Scalar
+or Galera. The canonical hostname continues through the application router,
+HTTP-to-HTTPS redirect, and existing CAPTCHA rules. Other paths and non-campus
+clients do not match the health fallback. Matching uses the connection's source
+IP, not `X-Forwarded-For`. HTTPS still requires a certificate matching the
+hostname used by the monitor.
+
 ### HAProxy and Galera on the Docker host
 
 For a local HAProxy listener, set `SCALAR_DB_HOSTNAME=host.docker.internal` in `.env`.

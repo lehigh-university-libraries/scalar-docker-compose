@@ -1,5 +1,16 @@
 http:
   routers:
+    campus-health-http:
+      rule: ClientIP(`128.180.0.0/16`) && !Host(`scalar.lehigh.edu`) && Path(`/`)
+      entryPoints: [web]
+      priority: 10
+      service: ping@internal
+    campus-health-https:
+      rule: ClientIP(`128.180.0.0/16`) && !Host(`scalar.lehigh.edu`) && Path(`/`)
+      entryPoints: [websecure]
+      tls: {}
+      priority: 10
+      service: ping@internal
     scalar:
       rule: Host(`scalar.lehigh.edu`)
       entryPoints: [websecure]
