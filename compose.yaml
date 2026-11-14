@@ -1,7 +1,6 @@
 services:
   db-backup:
-    # Pin MYSQL_BACKUP_IMAGE to the published digest after image release.
-    image: ${MYSQL_BACKUP_IMAGE:-ghcr.io/lehigh-university-libraries/mysql-backup:main}
+    image: ghcr.io/lehigh-university-libraries/mysql-backup:main@sha256:9c2d1fa98f8877eab68ecab826111febd1386805b2fe98a19697c2e7f1827290
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -23,6 +22,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
+      PHP_PM: ondemand
+      PHP_PM_MAX_CHILDREN: 10
       SCALAR_PHP_ERROR_REPORTING: ${SCALAR_PHP_ERROR_REPORTING:-4437}
       SCALAR_DB_HOSTNAME: ${SCALAR_DB_HOSTNAME:-}
       SCALAR_DB_USERNAME: ${SCALAR_DB_USERNAME:-}
