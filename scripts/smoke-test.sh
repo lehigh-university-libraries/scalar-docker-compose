@@ -61,7 +61,8 @@ networks:
         - subnet: 198.19.$(( $$ % 250 )).0/24
 YAML
 "${compose[@]}" build traefik
-"${compose[@]}" up -d --wait --wait-timeout 180
+# Start only the services under test; backups require production DB secrets.
+"${compose[@]}" up -d --wait --wait-timeout 180 scalar traefik
 "${compose[@]}" exec -T scalar sh -ec 'mkdir -p /opt/scalar/smoke; printf media-ok > /opt/scalar/smoke/media.txt; chmod 700 /opt/scalar/smoke'
 # Reproduce inaccessible files copied from an old host installation.
 if "${compose[@]}" exec -T --user nginx scalar sh -s -- check < scripts/permissions.sh; then
