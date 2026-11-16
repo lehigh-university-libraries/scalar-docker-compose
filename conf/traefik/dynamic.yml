@@ -34,7 +34,13 @@ http:
           window: 864000
           mode: regex
           protectRoutes: ["^/"]
-          excludeRoutes: ['^/google204a4e549d4da46a\.html$']
+          # Scalar version URLs (slug.1, slug.23) have a dotted "extension", so
+          # protect every extension and exclude real static assets instead.
+          excludeRoutes:
+            - '^/google204a4e549d4da46a\.html$'
+            - '^/system/application/views/'
+            - '\.(js|css|map|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot|mp3|mp4|webm|pdf)$'
+          protectAllExtensions: "true"
           protectParameters: "true"
           exemptIps: [128.180.0.0/16, 4.59.138.56/29, 162.223.16.248/29, 208.220.178.48/28, 209.66.120.16/28]
           challengeURL: ""
