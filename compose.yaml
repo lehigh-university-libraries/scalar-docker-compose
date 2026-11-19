@@ -1,6 +1,6 @@
 services:
   db-backup:
-    image: ghcr.io/lehigh-university-libraries/mysql-backup:main@sha256:9c2d1fa98f8877eab68ecab826111febd1386805b2fe98a19697c2e7f1827290
+    image: ghcr.io/lehigh-university-libraries/mysql-backup:main@sha256:502843d8772842bb3170a052222f091e6f5413cf1e920c81130e1ac61512368b
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -17,7 +17,7 @@ services:
       - ./backups:/db
 
   scalar:
-    image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:3c8c426b592ca1928eea9b4ae57cd12757fb4957ec7e7b32c652eb130ce2a8a7
+    image: ghcr.io/lehigh-university-libraries/scalar:2.6.12-php84@sha256:a7c6c486f8fc62a28d440630d059712a5ce40a9f5a6cdb35ed7a63926219eba5
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -58,7 +58,7 @@ services:
       retries: 3
 
   traefik:
-    image: traefik:v3.7.16@sha256:6d3e069ee484ab1da5adfdda555a75eb9b1545ef09096a0cc7c3043101986a20
+    image: traefik:v3.7.19@sha256:a6c0194dda77bcb804824580f36fa7edc56e315b1acfe933366c8b52844a78a4
     restart: unless-stopped
     command:
       - --ping=true
